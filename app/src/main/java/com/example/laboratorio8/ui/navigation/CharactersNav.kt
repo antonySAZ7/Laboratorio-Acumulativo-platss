@@ -10,6 +10,9 @@ import kotlinx.serialization.Serializable
 import com.example.laboratorio8.ui.screens.CharactersScreen
 import com.example.laboratorio8.ui.screens.CharacterDetailScreen
 
+import com.example.laboratorio8.ui.screens.characters.CharactersListRoute
+import com.example.laboratorio8.ui.screens.characters.CharacterDetailRoute
+
 @Serializable object CharactersRoot
 @Serializable object CharactersList
 @Serializable data class CharacterDetails(val id: Int)
@@ -17,13 +20,12 @@ import com.example.laboratorio8.ui.screens.CharacterDetailScreen
 fun NavGraphBuilder.charactersNav(nav: NavHostController) {
     navigation<CharactersRoot>(startDestination = CharactersList) {
         composable<CharactersList> {
-            CharactersScreen(onCharacterClick = { id ->
+            CharactersListRoute(onCharacterClick = { id ->
                 nav.navigate(CharacterDetails(id))
             })
         }
-        composable<CharacterDetails> { backStackEntry ->
-            val args = backStackEntry.toRoute<CharacterDetails>()
-            CharacterDetailScreen(id = args.id, onBack = { nav.popBackStack() })
+        composable<CharacterDetails> {
+            CharacterDetailRoute(onBack = { nav.popBackStack() })
         }
     }
 }

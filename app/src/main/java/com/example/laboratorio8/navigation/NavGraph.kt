@@ -1,3 +1,6 @@
+/*
+
+
 package com.example.laboratorio8.navigation
 
 
@@ -8,31 +11,28 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
 import com.example.laboratorio8.ui.screens.*
 import androidx.navigation.toRoute
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 
+import androidx.navigation.compose.navigation
 
+import com.example.laboratorio8.ui.screens.characters.CharactersListRoute
+import com.example.laboratorio8.ui.screens.characters.CharacterDetailRoute
 
-@Serializable object LoginRoute
-@Serializable object CharactersRoute
-@Serializable data class DetailsRoute(val id: Int)
+@Serializable object CharactersRoot
+@Serializable object CharactersList
+@Serializable data class CharacterDetails(val id: Int)
 
-@Composable
-fun NavGraph() {
-    val nav = rememberNavController()
-
-    NavHost(navController = nav, startDestination = LoginRoute) {
-        composable<LoginRoute> {
-            LoginScreen { nav.navigate(CharactersRoute) { popUpTo(LoginRoute){ inclusive = true } } }
+fun NavGraphBuilder.charactersNav(nav: NavHostController) {
+    navigation<CharactersRoot>(startDestination = CharactersList) {
+        composable<CharactersList> {
+            CharactersListRoute(onCharacterClick = { id ->
+                nav.navigate(CharacterDetails(id))
+            })
         }
-        composable<CharactersRoute> {
-            CharactersScreen { id -> nav.navigate(DetailsRoute(id)) }
-        }
-        composable<DetailsRoute> { backStackEntry ->
-            val args = backStackEntry.toRoute<DetailsRoute>()
-            CharacterDetailScreen(id = args.id, onBack = { nav.popBackStack() })
+        composable<CharacterDetails> {
+            CharacterDetailRoute(onBack = { nav.popBackStack() })
         }
     }
 }
+*/

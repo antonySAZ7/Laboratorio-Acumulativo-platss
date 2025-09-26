@@ -9,6 +9,8 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import com.example.laboratorio8.ui.screens.locations.LocationsListScreen
 import com.example.laboratorio8.ui.screens.locations.LocationDetailScreen
+import com.example.laboratorio8.ui.screens.locations.LocationsListRoute
+import com.example.laboratorio8.ui.screens.locations.LocationDetailRoute
 
 @Serializable object LocationsRoot
 @Serializable object LocationsList
@@ -17,13 +19,12 @@ import com.example.laboratorio8.ui.screens.locations.LocationDetailScreen
 fun NavGraphBuilder.locationsNav(nav: NavHostController) {
     navigation<LocationsRoot>(startDestination = LocationsList) {
         composable<LocationsList> {
-            LocationsListScreen(onLocationClick = { id ->
-                nav.navigate(LocationDetails(id))   // SOLO pasamos el ID
+            LocationsListRoute(onLocationClick = { id ->
+                nav.navigate(LocationDetails(id))
             })
         }
-        composable<LocationDetails> { entry ->
-            val args = entry.toRoute<LocationDetails>()
-            LocationDetailScreen(id = args.id, onBack = { nav.popBackStack() })
+        composable<LocationDetails> {
+            LocationDetailRoute(onBack = { nav.popBackStack() })
         }
     }
 }
