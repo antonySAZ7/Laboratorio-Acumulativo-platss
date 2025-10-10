@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -39,7 +40,9 @@ android {
         compose = true
     }
 }
-
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -60,4 +63,10 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+
+    implementation(libs.androidx.datastore.preferences)
 }
