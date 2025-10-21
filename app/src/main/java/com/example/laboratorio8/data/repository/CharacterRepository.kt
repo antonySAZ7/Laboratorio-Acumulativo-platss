@@ -1,23 +1,30 @@
 package com.example.laboratorio8.data.repository
 
 import com.example.laboratorio8.data.Character
-import com.example.laboratorio8.data.CharacterDb
 import com.example.laboratorio8.data.local.dao.CharacterDao
 import com.example.laboratorio8.data.mapper.toCharacter
 import com.example.laboratorio8.data.mapper.toEntity
-import kotlinx.coroutines.delay
+import com.example.laboratorio8.data.network.RickAndMortyApiService
 
-class CharacterRepository(private val characterDao: CharacterDao) {
-    private val db = CharacterDb()
+class CharacterRepository(
+    private val characterDao: CharacterDao,
+    private val apiService: RickAndMortyApiService
+) {
 
-    suspend fun syncCharacters() {
-        delay(4_000)
-        val characters = db.getAllCharacters()
-        characterDao.insertAll(characters.map { it.toEntity() })
-    }
-
+    // esto lo uso para primero cargarlo sin internet
     suspend fun getAllCharacters(): List<Character> {
-        return characterDao.getAllCharacters().map { it.toCharacter() }
+        val cachedCharacters = characterDao.getAllCharacters()
+
+        return if (cachedCharacters.isEmpty()) {
+            // Si no hay datos en caché, llama al API
+            val apiCharacters = apiService.getAllCharacters()
+            val entities = apiCharacters.results.map { it.toEntity() }
+            characterDao.insertAll(entities)
+            entities.map { it.toCharacter() }
+        } else {
+            // Si hay datos en caché, retorna esos
+            cachedCharacters.map { it.toCharacter() }
+        }
     }
 
     suspend fun getCharacterById(id: Int): Character? {

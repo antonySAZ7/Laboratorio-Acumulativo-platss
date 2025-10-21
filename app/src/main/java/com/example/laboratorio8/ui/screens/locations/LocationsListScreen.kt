@@ -1,6 +1,5 @@
 package com.example.laboratorio8.ui.screens.locations
 
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,19 +13,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.laboratorio8.data.LocationDb
+import com.example.laboratorio8.data.Location
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationsListScreen(
+    locations: List<Location>,
     onLocationClick: (Int) -> Unit
 ) {
-    val db = remember { LocationDb() }
-    val locations = remember { db.getAllLocations() } // Nombre y Tipo
-
     Scaffold(
         topBar = { TopAppBar(title = { Text("Locations") }) }
     ) { padding ->

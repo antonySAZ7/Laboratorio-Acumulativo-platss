@@ -1,4 +1,3 @@
-
 package com.example.laboratorio8.ui.viewmodel
 
 import android.app.Application
@@ -20,9 +19,6 @@ data class LoginUiState(
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val userPreferences = UserPreferences(application)
-    private val database = AppDatabase.getDatabase(application)
-    private val characterRepository = CharacterRepository(database.characterDao())
-    private val locationRepository = LocationRepository(database.locationDao())
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
@@ -46,13 +42,9 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
             try {
-
+                // Solo guardar nombre en DataStore
+                // La sincronización con API se hace automáticamente en los ViewModels
                 userPreferences.saveUserName(name)
-
-
-                characterRepository.syncCharacters()
-                locationRepository.syncLocations()
-
                 _uiState.value = _uiState.value.copy(isLoading = false)
                 onSuccess()
             } catch (e: Exception) {

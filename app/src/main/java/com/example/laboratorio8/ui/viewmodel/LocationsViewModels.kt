@@ -1,4 +1,3 @@
-
 package com.example.laboratorio8.ui.viewmodel
 
 import android.app.Application
@@ -7,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.laboratorio8.data.Location
 import com.example.laboratorio8.data.local.AppDatabase
+import com.example.laboratorio8.data.network.RickAndMortyApiService
 import com.example.laboratorio8.data.repository.LocationRepository
 import com.example.laboratorio8.ui.state.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,21 +20,16 @@ class LocationsListViewModel(application: Application) : AndroidViewModel(applic
 
     init {
         val database = AppDatabase.getDatabase(application)
-        repository = LocationRepository(database.locationDao())
+        val apiService = RickAndMortyApiService.create()  // ← AGREGAR ESTO
+        repository = LocationRepository(database.locationDao(), apiService)  // ← PASAR apiService
         load()
     }
 
     fun load() = viewModelScope.launch {
         _ui.value = UiState(isLoading = true)
         try {
-            val cachedLocations = repository.getAllLocations()
-            if (cachedLocations.isEmpty()) {
-                repository.syncLocations()
-                val locations = repository.getAllLocations()
-                _ui.value = UiState(isLoading = false, data = locations)
-            } else {
-                _ui.value = UiState(isLoading = false, data = cachedLocations)
-            }
+            val locations = repository.getAllLocations()
+            _ui.value = UiState(isLoading = false, data = locations)
         } catch (e: Exception) {
             _ui.value = UiState(isLoading = false, hasError = true)
         }
@@ -57,7 +52,8 @@ class LocationDetailViewModel(
 
     init {
         val database = AppDatabase.getDatabase(application)
-        repository = LocationRepository(database.locationDao())
+        val apiService = RickAndMortyApiService.create()  // ← AGREGAR ESTO
+        repository = LocationRepository(database.locationDao(), apiService)  // ← PASAR apiService
         load()
     }
 

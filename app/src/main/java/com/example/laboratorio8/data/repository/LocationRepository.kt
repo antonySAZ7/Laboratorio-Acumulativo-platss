@@ -1,24 +1,30 @@
 package com.example.laboratorio8.data.repository
 
-
 import com.example.laboratorio8.data.Location
-import com.example.laboratorio8.data.LocationDb
 import com.example.laboratorio8.data.local.dao.LocationDao
 import com.example.laboratorio8.data.mapper.toEntity
 import com.example.laboratorio8.data.mapper.toLocation
-import kotlinx.coroutines.delay
+import com.example.laboratorio8.data.network.RickAndMortyApiService
 
-class LocationRepository(private val locationDao: LocationDao) {
-    private val db = LocationDb()
+class LocationRepository(
+    private val locationDao: LocationDao,
+    private val apiService: RickAndMortyApiService
+) {
 
-    suspend fun syncLocations() {
-        delay(4_000)
-        val locations = db.getAllLocations()
-        locationDao.insertAll(locations.map { it.toEntity() })
-    }
-
+   // para que la primera vez se utilice sin red
     suspend fun getAllLocations(): List<Location> {
-        return locationDao.getAllLocations().map { it.toLocation() }
+        val cachedLocations = locationDao.getAllLocations()
+
+        return if (cachedLocations.isEmpty()) {
+            // llmar al api si no hay datos en cache
+            val apiLocations = apiService.getAllLocations()
+            val entities = apiLocations.results.map { it.toEntity() }
+            locationDao.insertAll(entities)
+            entities.map { it.toLocation() }
+        } else {
+            // Si hay datos en cache, retornarlos
+            cachedLocations.map { it.toLocation() }
+        }
     }
 
     suspend fun getLocationById(id: Int): Location? {

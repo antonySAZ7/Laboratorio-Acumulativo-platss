@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.laboratorio8.data.Character
 import com.example.laboratorio8.data.local.AppDatabase
+import com.example.laboratorio8.data.network.RickAndMortyApiService
 import com.example.laboratorio8.data.repository.CharacterRepository
 import com.example.laboratorio8.ui.state.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,21 +20,16 @@ class CharactersListViewModel(application: Application) : AndroidViewModel(appli
 
     init {
         val database = AppDatabase.getDatabase(application)
-        repository = CharacterRepository(database.characterDao())
+        val apiService = RickAndMortyApiService.create()
+        repository = CharacterRepository(database.characterDao(), apiService)
         load()
     }
 
     fun load() = viewModelScope.launch {
         _ui.value = UiState(isLoading = true)
         try {
-            val cachedCharacters = repository.getAllCharacters()
-            if (cachedCharacters.isEmpty()) {
-                repository.syncCharacters()
-                val characters = repository.getAllCharacters()
-                _ui.value = UiState(isLoading = false, data = characters)
-            } else {
-                _ui.value = UiState(isLoading = false, data = cachedCharacters)
-            }
+            val characters = repository.getAllCharacters()
+            _ui.value = UiState(isLoading = false, data = characters)
         } catch (e: Exception) {
             _ui.value = UiState(isLoading = false, hasError = true)
         }
@@ -56,7 +52,8 @@ class CharacterDetailViewModel(
 
     init {
         val database = AppDatabase.getDatabase(application)
-        repository = CharacterRepository(database.characterDao())
+        val apiService = RickAndMortyApiService.create()
+        repository = CharacterRepository(database.characterDao(), apiService)
         load()
     }
 
